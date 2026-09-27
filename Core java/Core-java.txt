@@ -1,0 +1,143 @@
+package Task1;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
+
+class VotingThread extends Thread {
+    String voterName;
+    int choice;
+
+    VotingThread(String voterName, int choice) {
+        this.voterName = voterName;
+        this.choice = choice;
+    }
+
+    public void run() {
+
+        try {
+
+            switch (choice) {
+
+                case 1:
+                    OnlineVotingSystem.votedVoters.put(voterName, "Candidate A");
+                    OnlineVotingSystem.candidateAVotes++;
+                    System.out.println(   voterName + " voted for Candidate A");
+                    break;
+
+                case 2:
+                    OnlineVotingSystem.votedVoters.put(voterName, "Candidate B");
+                    OnlineVotingSystem.candidateBVotes++;
+                    System.out.println(voterName + " voted for Candidate B");
+                    break;
+
+                default:
+                    throw new Exception(
+                            "Invalid candidate choice!"
+                    );
+            }
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "Exception: " + e.getMessage()
+            );
+        }
+    }
+}
+
+
+public class OnlineVotingSystem {
+
+    static HashMap<String, String> votedVoters =new HashMap<>();
+    static int candidateAVotes = 0;
+    static int candidateBVotes = 0;
+
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+
+            while (true) {
+
+                System.out.println(  "\n===== ONLINE VOTING SYSTEM =====");
+                System.out.println("1. Vote");
+                System.out.println("2. View Voted Voters");
+                System.out.println("3. View Candidate Results");
+                System.out.println("4. Exit");
+
+                System.out.print("Enter your choice: ");
+                int menuChoice = sc.nextInt();
+                sc.nextLine();
+
+
+                switch (menuChoice) {
+
+                    case 1:
+
+                        System.out.print("Enter voter name: ");
+                        String voterName = sc.nextLine();
+
+                        System.out.print("Enter your age: ");
+                        int age = sc.nextInt();
+
+                        if (age < 18) {
+                            throw new Exception( "You are not eligible to vote!");
+                        }
+
+                        if (votedVoters.containsKey(voterName)) {
+
+                            throw new Exception( "You have already voted!" );
+                        }
+
+
+                        System.out.println("\nCandidates:");
+                        System.out.println("1. Candidate A");
+                        System.out.println("2. Candidate B");
+
+                        System.out.print("Choose candidate: ");
+                        int candidateChoice = sc.nextInt();
+
+                        VotingThread thread = new VotingThread(voterName, candidateChoice);
+                        thread.start();
+                        thread.join();
+                        break;
+
+                    case 2:
+
+                        System.out.println("\n===== VOTED VOTERS =====");
+                        if (votedVoters.isEmpty()) {
+                            System.out.println("No voters have voted yet.");
+                        }
+                        else {
+
+                            for (String voter :votedVoters.keySet()) {
+                                String candidate =   votedVoters.get(voter);
+                                System.out.println( voter + " -> " + candidate);}}
+                                break;
+
+
+
+                    case 3:
+
+                        System.out.println("\n===== VOTING RESULTS =====");
+                        System.out.println( "Candidate A = "+ candidateAVotes+ " votes");
+                        System.out.println("Candidate B = "+ candidateBVotes + " votes"  );
+                        break;
+
+
+                    case 4:
+
+                        System.out.println( "Thank you for using the Online Voting System!" );
+                        sc.close();
+                        return;
+
+                    default:
+                        throw new Exception(    "Invalid menu choice!"     );}}
+
+        }
+        catch (Exception e) {
+            System.out.println("\nException: " + e.getMessage());
+        }}}
